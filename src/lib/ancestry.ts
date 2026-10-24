@@ -86,7 +86,7 @@ export function parseFile(name: string, text: string): Entry[] {
   if (name.toLowerCase().endsWith(".json")) {
     const data = JSON.parse(text);
     const arr = Array.isArray(data) ? data : Array.isArray(data?.results) ? data.results : Object.entries(data).map(([region, percent]) => ({ region, percent }));
-    return arr.map((r: Record<string, unknown>) =>
+    return arr.map((r: { region?: unknown; country?: unknown; name?: unknown; percent?: unknown; percentage?: unknown; value?: unknown }) =>
       newEntry(String(r.region ?? r.country ?? r.name ?? ""), Number(r.percent ?? r.percentage ?? r.value ?? 0)),
     );
   }

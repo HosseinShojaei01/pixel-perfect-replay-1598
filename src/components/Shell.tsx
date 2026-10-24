@@ -8,7 +8,7 @@ import { blip } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 
 const HelixLazy = lazy(() => import("./Helix3D"));
-export function Helix({ speed, className }: { speed?: number; className?: string }) {
+export function Helix({ speed, className }: { speed?: number | undefined; className?: string }) {
   return (
     <div className={className}>
       <ClientOnly fallback={<div className="h-full w-full animate-pulse rounded-full bg-violet/5" />}>

@@ -2,7 +2,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
-function Helix({ speed = 0.3 }: { speed?: number }) {
+function Helix({ speed = 0.3 }: { speed?: number | undefined }) {
   const g = useRef<THREE.Group>(null);
   const { a, b, rungs } = useMemo(() => {
     const a: [number, number, number][] = [], b: typeof a = [], rungs: { pos: THREE.Vector3; quat: THREE.Quaternion; len: number }[] = [];
@@ -35,7 +35,7 @@ function Helix({ speed = 0.3 }: { speed?: number }) {
   );
 }
 
-export default function Helix3D({ speed }: { speed?: number }) {
+export default function Helix3D({ speed }: { speed?: number | undefined }) {
   return (
     <Canvas camera={{ position: [0, 0, 9], fov: 50 }} dpr={[1, 1.75]} gl={{ alpha: true, antialias: true }}>
       <ambientLight intensity={0.4} />
