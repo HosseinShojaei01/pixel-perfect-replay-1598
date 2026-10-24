@@ -57,7 +57,7 @@ function Analysis() {
 
       <div className="mt-8 font-display text-6xl font-bold tabular-nums text-gradient">{p}%</div>
       <AnimatePresence mode="wait">
-        <motion.p key={stage} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-2 text-lg font-medium">{t(STAGES[stage])}</motion.p>
+        <motion.p key={stage} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-2 text-lg font-medium">{t(STAGES[stage] ?? "")}</motion.p>
       </AnimatePresence>
 
       <ol className="glass mt-8 w-full max-w-md space-y-2 rounded-3xl p-5 text-start text-sm">

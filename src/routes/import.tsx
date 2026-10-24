@@ -33,7 +33,7 @@ function ImportPage() {
 
   const onFile = (f?: File) => {
     if (!f) return;
-    if (f.size > 1024 * 1024) return toast.error("File too large (max 1 MB)");
+    if (f.size > 1024 * 1024) { toast.error("File too large (max 1 MB)"); return; }
     f.text().then((txt) => {
       try {
         const parsed = parseFile(f.name, txt);

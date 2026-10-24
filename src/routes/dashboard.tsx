@@ -39,7 +39,7 @@ function Dashboard() {
   const [sel, setSel] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const date = useMemo(() => new Date().toLocaleDateString(lang === "fa" ? "fa-IR" : "en-GB", { dateStyle: "long" }), [lang]);
-  const top = entries.reduce((a, b) => (b.percent > a.percent ? b : a), entries[0]);
+  const top = entries.reduce<(typeof entries)[number] | undefined>((a, b) => (!a || b.percent > a.percent ? b : a), undefined);
   const pick = (id: string) => { setSel(id); blip(620); };
 
   const pdf = async () => {

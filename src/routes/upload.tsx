@@ -48,8 +48,8 @@ function UploadPage() {
 
   const handle = useCallback((f?: File) => {
     if (!f) return;
-    if (!TYPES.includes(f.type)) return toast.error("Unsupported file", { description: "Please use JPG, PNG or WEBP." });
-    if (f.size > MAX) return toast.error("File too large", { description: "Maximum size is 10 MB." });
+    if (!TYPES.includes(f.type)) { toast.error("Unsupported file", { description: "Please use JPG, PNG or WEBP." }); return; }
+    if (f.size > MAX) { toast.error("File too large", { description: "Maximum size is 10 MB." }); return; }
     const r = new FileReader();
     r.onload = () => { setRaw(r.result as string); setZoom(1); blip(700); };
     r.onerror = () => toast.error("Couldn't read that image.");
