@@ -17,11 +17,11 @@ export default function WorldMap({ entries, selected, onSelect, dark, label }: {
   const sel = pts.find((p) => p.e.id === selected);
   const hub = pts[0]?.info;
   const tiles = dark
-    ? "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png";
+    ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+    : "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}";
   return (
     <MapContainer center={[38, 35]} zoom={3} minZoom={2} scrollWheelZoom={false} className="h-full w-full rounded-2xl" worldCopyJump>
-      <TileLayer url={tiles} attribution="&copy; OpenStreetMap &copy; CARTO" />
+      <TileLayer url={tiles} attribution="Tiles &copy; Esri" maxZoom={16} />
       {hub && pts.slice(1).map((p) => (
         <Polyline key={`l${p.e.id}`} positions={[[hub.lat, hub.lng], [p.info!.lat, p.info!.lng]]} pathOptions={{ color: colorFor(p.i), weight: 1.5, opacity: 0.7, dashArray: "4 6" }} />
       ))}
