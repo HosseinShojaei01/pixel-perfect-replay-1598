@@ -48,7 +48,7 @@ export function regionInfo(name: string): Info | undefined {
 }
 
 export const PALETTE = ["#8B5CF6", "#06B6D4", "#EC4899", "#22D3EE", "#A78BFA", "#F472B6", "#34D399", "#FBBF24", "#60A5FA", "#F87171"];
-export const colorFor = (i: number) => PALETTE[i % PALETTE.length];
+export const colorFor = (i: number): string => PALETTE[i % PALETTE.length] ?? "#8B5CF6";
 
 export const total = (e: Entry[]) => Math.round(e.reduce((s, x) => s + (Number(x.percent) || 0), 0) * 100) / 100;
 
@@ -92,6 +92,6 @@ export function parseFile(name: string, text: string): Entry[] {
   }
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   const rows = lines.map((l) => l.split(/[,;\t]/).map((c) => c.trim().replace(/^"|"$/g, "")));
-  if (rows.length && isNaN(parseFloat(rows[0][1]))) rows.shift();
-  return rows.filter((r) => r.length >= 2).map((r) => newEntry(r[0], parseFloat(r[1].replace("%", ""))));
+  if (rows.length && isNaN(parseFloat(rows[0]?.[1] ?? ""))) rows.shift();
+  return rows.filter((r) => r.length >= 2).map((r) => newEntry(r[0] ?? "", parseFloat((r[1] ?? "").replace("%", ""))));
 }
