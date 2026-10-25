@@ -30,3 +30,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python comparison service
+backend/models/*.onnx
+backend/data/
+backend/.env
+__pycache__/
+.pytest_cache/

@@ -43,6 +43,7 @@ export function Nav() {
           <a href="/#features" className="hover:text-foreground">{t("Features")}</a>
           <a href="/#how" className="hover:text-foreground">{t("How It Works")}</a>
           <Link to="/import" className="hover:text-foreground">{t("Real DNA Results")}</Link>
+          <Link to="/references" className="hover:text-foreground">References</Link>
         </div>
         <div className="ms-auto flex items-center gap-1.5">
           <button aria-label="Language" className={iconBtn} onClick={() => setLang(lang === "en" ? "fa" : "en")}><Languages className="h-4 w-4" /></button>

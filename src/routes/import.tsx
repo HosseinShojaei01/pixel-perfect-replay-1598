@@ -16,6 +16,8 @@ export const Route = createFileRoute("/import")({
       { name: "description", content: "Enter or upload your DNA test ancestry results (CSV or JSON) and visualize them." },
       { property: "og:title", content: "Import Real DNA Results — OriginDNA" },
       { property: "og:description", content: "Bring your genetic test results to life on the OriginDNA dashboard." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ImportPage,

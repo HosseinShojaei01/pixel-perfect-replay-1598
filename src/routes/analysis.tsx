@@ -6,6 +6,8 @@ import { Page, Helix, btnPrimary } from "@/components/Shell";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { blip } from "@/lib/sound";
+import { comparePortrait } from "@/lib/comparison";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/analysis")({
   head: () => ({
@@ -13,32 +15,48 @@ export const Route = createFileRoute("/analysis")({
       { title: "Building Your Experience — OriginDNA" },
       { name: "description", content: "A cinematic visual simulation that prepares your OriginDNA dashboard." },
       { property: "og:title", content: "Building Your Experience — OriginDNA" },
-      { property: "og:description", content: "Watch your ancestry dashboard come to life." },
+      { property: "og:description", content: "Real photographic comparison against licensed reference images." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Analysis,
 });
 
-const STAGES = ["Preparing Your Experience", "Building Your Visualization", "Mapping Demo Regions", "Generating Your Dashboard", "Experience Ready"];
+const STAGES = ["Sending your image", "Image validated", "Measuring photographic features", "Comparing reference images", "Comparison ready"];
 
 function Analysis() {
-  const { portrait } = useApp();
+  const { portrait, apiUrl, processingConsent, setComparison } = useApp();
   const { t } = useT();
   const nav = useNavigate();
   const [p, setP] = useState(0);
 
+  const [stage, setStage] = useState(0);
+  const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setP((v) => { if (v >= 100) { clearInterval(id); return 100; } return v + 1; }), 55);
-    return () => clearInterval(id);
-  }, []);
-  const stage = Math.min(4, Math.floor(p / 25));
+    setP(0); setStage(0); setError("");
+    if (!portrait || !processingConsent) { setError("Upload a portrait and give processing consent first."); return; }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
+    comparePortrait(apiUrl, portrait, processingConsent, (progress, label) => {
+      setP(progress); setStage(Math.max(0, STAGES.indexOf(label)));
+    }, controller.signal).then((result) => {
+      if (!controller.signal.aborted) { setComparison(result); setP(100); setStage(4); }
+    }).catch((err) => {
+      setP(0);
+      if (controller.signal.aborted) setError("Comparison cancelled or timed out. No substitute results were generated.");
+      else setError(err instanceof Error ? err.message : "Comparison failed.");
+    }).finally(() => clearTimeout(timeout));
+    return () => { clearTimeout(timeout); controller.abort(); };
+  }, [portrait, apiUrl, processingConsent, attempt]);
   useEffect(() => { blip(400 + stage * 120, 0.12); }, [stage]);
 
   const R = 120, C = 2 * Math.PI * R;
   return (
     <Page className="flex flex-col items-center pt-10 text-center">
       <span className="inline-flex items-center gap-2 rounded-full border border-warning/40 bg-warning/10 px-3 py-1 text-xs text-warning">
-        <FlaskConical className="h-3.5 w-3.5" /> {t("Visual simulation only — no genetic or facial analysis is performed.")}
+        <FlaskConical className="h-3.5 w-3.5" /> Photographic comparison only — no genetic or demographic inference.
       </span>
 
       <div className="relative mt-10 h-[300px] w-[300px] sm:h-[340px] sm:w-[340px]">
@@ -70,7 +88,12 @@ function Analysis() {
         ))}
       </ol>
 
-      <button className={btnPrimary + " mt-8"} disabled={p < 100} onClick={() => nav({ to: "/dashboard" })}>{t("Open Dashboard")}</button>
+      {error && <div role="alert" className="mt-6 max-w-md text-sm text-destructive">{error}</div>}
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        {error && <Button variant="outline" onClick={() => setAttempt((v) => v + 1)}>Retry comparison</Button>}
+        <Button variant="outline" onClick={() => nav({ to: "/upload" })}>Back to upload</Button>
+        <Button className={btnPrimary} disabled={p < 100 || Boolean(error)} onClick={() => nav({ to: "/dashboard" })}>{t("Open Dashboard")}</Button>
+      </div>
     </Page>
   );
 }
