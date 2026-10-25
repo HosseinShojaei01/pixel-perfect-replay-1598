@@ -10,6 +10,7 @@ import { useT } from "@/lib/i18n";
 import { colorFor, regionInfo } from "@/lib/ancestry";
 import { downloadReport } from "@/lib/report";
 import { blip } from "@/lib/sound";
+import { VisualResults } from "@/components/VisualResults";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -17,7 +18,9 @@ export const Route = createFileRoute("/dashboard")({
       { title: "Ancestry Dashboard — OriginDNA" },
       { name: "description", content: "Interactive world map, ancestry chart, country breakdown and downloadable report." },
       { property: "og:title", content: "Ancestry Dashboard — OriginDNA" },
-      { property: "og:description", content: "Explore ancestry results on a cinematic interactive dashboard." },
+      { property: "og:description", content: "Real photographic similarity, separate from user-supplied genetic ancestry." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
@@ -65,19 +68,22 @@ function Dashboard() {
             <div className="grid h-28 w-28 place-items-center rounded-full bg-background"><User className="h-10 w-10 text-muted-foreground" /></div>}
         </div>
         <div className="flex-1 text-center sm:text-start">
-          <ModeBadge mode={mode} />
+          {entries.length > 0 ? <ModeBadge mode={mode} /> : <span className="text-xs text-cyan">Photographic comparison · not genetic analysis</span>}
           <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{t("Welcome")}{name ? `, ${name}` : ""} <span className="text-gradient">✦</span></h1>
           <p className="mt-1 text-muted-foreground">{t("Your Ancestry Dashboard")}</p>
           <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground"><Calendar className="h-3.5 w-3.5" /> {date}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">
-          <button className={btnPrimary} onClick={pdf} disabled={busy}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}{t("Download PDF")}</button>
-          <button className={btnGhost} onClick={share}><Share2 className="h-4 w-4" />{t("Share preview")}</button>
+          <button className={btnPrimary} onClick={pdf} disabled={busy || !entries.length}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}{t("Download PDF")}</button>
+          <button disabled={!entries.length} className={btnGhost} onClick={share}><Share2 className="h-4 w-4" />{t("Share preview")}</button>
           {portrait && <button className={btnGhost} onClick={() => { setPortrait(null); toast.success("Photo deleted from this session"); }}><Trash2 className="h-4 w-4" />{t("Delete photo")}</button>}
           <Link to="/import" className={btnGhost}><Pencil className="h-4 w-4" />{mode === "demo" ? t("Import Real Results") : "Edit"}</Link>
         </div>
       </motion.section>
 
+      <VisualResults />
+      <h2 className="mt-10 text-xl font-semibold">Genetic Ancestry</h2>
+      {!entries.length && <p className="mt-3 text-sm text-muted-foreground">No genetic test results imported. <Link className="text-cyan underline" to="/import">Import DNA results</Link> to populate ancestry percentages and the geographic map.</p>}
       <div className="mt-5 grid gap-5 lg:grid-cols-3">
         {/* Map */}
         <section className={card + " lg:col-span-2"}>
@@ -104,7 +110,7 @@ function Dashboard() {
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
-              <div><div className="font-display text-3xl font-bold text-gradient">{top?.percent}%</div><div className="text-xs text-muted-foreground">{top && region(top.region)}</div></div>
+              <div><div className="font-display text-3xl font-bold text-gradient">{top ? `${top.percent}%` : "—"}</div><div className="text-xs text-muted-foreground">{top && region(top.region)}</div></div>
             </div>
           </div>
           <ul className="mt-2 space-y-1.5">
@@ -139,7 +145,7 @@ function Dashboard() {
       <div className="mt-10 grid gap-5 lg:grid-cols-[1fr_1.3fr]">
         <section className={card + " relative overflow-hidden"}>
           <h2 className="text-lg font-semibold">{t("Your Genome, Visualized")}</h2>
-          <p className="text-sm text-muted-foreground">An artistic, real-time double helix.</p>
+          <p className="text-sm text-muted-foreground">Artistic double helix — not a reconstruction of your genome.</p>
           <Helix speed={0.6} className="h-80" />
         </section>
         <section className={card}>

@@ -8,6 +8,8 @@ import { Page, btnPrimary, btnGhost } from "@/components/Shell";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import { blip } from "@/lib/sound";
+import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/upload")({
   head: () => ({
@@ -16,6 +18,8 @@ export const Route = createFileRoute("/upload")({
       { name: "description", content: "Add an optional portrait to personalize your OriginDNA ancestry dashboard." },
       { property: "og:title", content: "Upload Portrait — OriginDNA" },
       { property: "og:description", content: "Personalize your ancestry experience with a private portrait." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: UploadPage,
@@ -31,12 +35,14 @@ async function cropImage(src: string, area: Area): Promise<string> {
   const c = document.createElement("canvas");
   const size = Math.min(800, area.width);
   c.width = c.height = size;
-  c.getContext("2d")!.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, size, size);
+  const ctx = c.getContext("2d");
+  if (!ctx) throw new Error("Image cropping is unavailable");
+  ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, size, size);
   return c.toDataURL("image/jpeg", 0.9);
 }
 
 function UploadPage() {
-  const { portrait, setPortrait, name, setName, startDemo } = useApp();
+  const { portrait, setPortrait, name, setName, apiUrl, setComparison, setProcessingConsent } = useApp();
   const { t } = useT();
   const nav = useNavigate();
   const [raw, setRaw] = useState<string | null>(null);
@@ -58,18 +64,19 @@ function UploadPage() {
 
   const applyCrop = async () => {
     if (!raw || !area) return;
-    setPortrait(await cropImage(raw, area));
-    setRaw(null);
-    toast.success("Portrait ready");
+    try {
+      setPortrait(await cropImage(raw, area)); setConsent(false);
+      setRaw(null); toast.success("Portrait ready");
+    } catch { toast.error("Couldn't crop that image. Please try again."); }
   };
 
-  const go = () => { startDemo(); blip(880); nav({ to: "/analysis" }); };
+  const go = () => { if (!portrait || !consent) return; setComparison(null); setProcessingConsent(true); blip(880); nav({ to: "/analysis" }); };
 
   return (
     <Page className="pt-10">
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="text-4xl font-bold sm:text-5xl"><span className="text-gradient">{t("Upload your portrait")}</span></h1>
-        <p className="mt-3 text-muted-foreground">Used only to personalize your dashboard — never to predict ethnicity, genetics, nationality or ancestry.</p>
+        <p className="mt-3 text-muted-foreground">Compare photographic lighting, composition and style — never ethnicity, genetics, nationality or ancestry.</p>
       </div>
 
       <div className="glass glow-border mx-auto mt-10 max-w-2xl rounded-3xl p-6 sm:p-8">
@@ -85,8 +92,8 @@ function UploadPage() {
                 <input type="range" min={1} max={3} step={0.01} value={zoom} onChange={(e) => setZoom(+e.target.value)} className="flex-1 accent-[var(--violet)]" aria-label="Zoom" />
               </label>
               <div className="mt-5 flex justify-center gap-3">
-                <button className={btnGhost} onClick={() => setRaw(null)}>Cancel</button>
-                <button className={btnPrimary} onClick={applyCrop}><Check className="h-4 w-4" /> Apply crop</button>
+                <Button className={btnGhost} onClick={() => setRaw(null)}>Cancel</Button>
+                <Button className={btnPrimary} onClick={applyCrop}><Check className="h-4 w-4" /> Apply crop</Button>
               </div>
             </motion.div>
           ) : portrait ? (
@@ -97,7 +104,7 @@ function UploadPage() {
               <div className="mt-5 flex gap-3">
                 <label className={btnGhost + " cursor-pointer"}><ImagePlus className="h-4 w-4" /> Replace
                   <input type="file" accept={TYPES.join(",")} className="sr-only" onChange={(e) => handle(e.target.files?.[0])} /></label>
-                <button className={btnGhost} onClick={() => { setPortrait(null); toast("Photo removed"); }}><Trash2 className="h-4 w-4" /> {t("Remove")}</button>
+                <Button className={btnGhost} onClick={() => { setPortrait(null); setConsent(false); toast("Photo removed"); }}><Trash2 className="h-4 w-4" /> {t("Remove")}</Button>
               </div>
             </motion.div>
           ) : (
@@ -118,14 +125,15 @@ function UploadPage() {
             className="w-full rounded-xl border border-input bg-background/40 px-4 py-3 text-sm outline-none focus:border-ring" />
           <label className="flex items-start gap-3 rounded-2xl bg-muted/50 p-4 text-sm">
             <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[var(--violet)]" />
-            <span className="text-muted-foreground"><ShieldCheck className="me-1 inline h-4 w-4 text-success" />I consent to my photo being displayed locally in my browser for this session. It is not uploaded, stored, or analyzed.</span>
+            <span className="text-muted-foreground"><ShieldCheck className="me-1 inline h-4 w-4 text-success" />I consent to sending my cropped photo to the configured Python service for photographic comparison. It is processed in memory, not permanently stored or used for training. No ancestry is inferred.</span>
           </label>
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
-          <button className={btnGhost} onClick={() => { setPortrait(null); go(); }}>{t("Continue in Demo Mode")}</button>
-          <button className={btnPrimary} disabled={!portrait || !consent} onClick={go}>{t("Continue")} <ArrowRight className="h-4 w-4 rtl:rotate-180" /></button>
+          <Button asChild className={btnGhost}><Link to="/import">{t("Import Real Results")}</Link></Button>
+          <Button className={btnPrimary} disabled={!portrait || !consent} onClick={go}>{t("Continue")} <ArrowRight className="h-4 w-4 rtl:rotate-180" /></Button>
         </div>
+        {!apiUrl && <p className="mt-4 text-sm text-warning">Python service not connected. <Link className="underline" to="/references">Reference management</Link></p>}
       </div>
     </Page>
   );

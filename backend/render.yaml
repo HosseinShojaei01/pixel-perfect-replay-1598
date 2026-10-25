@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: origindna-comparison
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: DATA_DIR
+        value: /data
+    disk:
+      name: references
+      mountPath: /data
+      sizeGB: 1

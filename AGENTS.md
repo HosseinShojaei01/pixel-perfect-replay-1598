@@ -10,6 +10,9 @@
 <!-- LOVABLE:END -->
 
 ## Architecture
-- App state (portrait, entries, mode, prefs) lives in `src/lib/store.tsx` React context; portraits stay in memory only — privacy requirement, never persist or upload them.
+- App state (portrait, entries, mode, prefs) lives in `src/lib/store.tsx` React context; portraits and visual results stay in memory; send cropped portraits to the configured Python API only with explicit consent, never persist them.
 - Browser-only libs (Three.js helix, Leaflet map) are lazy-loaded behind `ClientOnly` in `src/components/Shell.tsx` — they break SSR if imported statically.
 - Ancestry rules (validation, normalization, CSV/JSON parsing) live in `src/lib/ancestry.ts` with tests beside it.
+
+- The separately deployed `backend/` FastAPI service owns persisted references and pretrained embeddings; browser comparisons stream real API stages and never fall back to ancestry or fabricated scores.
+- Genetic dashboard entries originate only from imported user data; reference labels are restricted to non-sensitive photographic attributes.

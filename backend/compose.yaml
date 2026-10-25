@@ -1,0 +1,14 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?Set a secure administrator token}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Set exact frontend origins}
+      DATA_DIR: /data
+    volumes:
+      - reference-data:/data
+    restart: unless-stopped
+volumes:
+  reference-data:

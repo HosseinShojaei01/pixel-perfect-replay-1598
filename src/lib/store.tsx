@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { DEMO_DATA, type Entry, type Mode } from "./ancestry";
+import { type Entry, type Mode } from "./ancestry";
+import type { Comparison } from "./comparison";
 import { setMuted } from "./sound";
 
 type Lang = "en" | "fa";
@@ -11,6 +12,9 @@ type State = {
   name: string; setName: (n: string) => void;
   mode: Mode; entries: Entry[];
   startDemo: () => void; setReal: (e: Entry[]) => void;
+  apiUrl: string; setApiUrl: (url: string) => void;
+  processingConsent: boolean; setProcessingConsent: (consent: boolean) => void;
+  comparison: Comparison | null; setComparison: (result: Comparison | null) => void;
 };
 const Ctx = createContext<State | null>(null);
 
@@ -18,13 +22,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Lang>("en");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [muted, setM] = useState(true);
-  // Portrait lives only in memory: never persisted or uploaded.
-  const [portrait, setPortrait] = useState<string | null>(null);
+  // Portrait and comparison remain in memory; consent is required for transient API processing.
+  const [portrait, setP] = useState<string | null>(null);
+  const [comparison, setComparison] = useState<Comparison | null>(null);
+  const [processingConsent, setProcessingConsent] = useState(false);
+  const [apiUrl, setApiUrl] = useState(import.meta.env.VITE_PYTHON_API_URL ?? "");
+  const setPortrait = (photo: string | null) => { setP(photo); setComparison(null); setProcessingConsent(false); };
   const [name, setName] = useState("");
   const [mode, setMode] = useState<Mode>("demo");
-  const [entries, setEntries] = useState<Entry[]>(DEMO_DATA);
+  const [entries, setEntries] = useState<Entry[]>([]);
 
   useEffect(() => {
+    const configured = localStorage.getItem("odna-api-url");
+    if (configured) setApiUrl(configured);
     const s = localStorage.getItem("odna-prefs");
     if (s) try { const p = JSON.parse(s); p.lang && setLang(p.lang); p.theme && setTheme(p.theme); typeof p.muted === "boolean" && setM(p.muted); } catch {}
   }, []);
@@ -41,7 +51,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       lang, setLang, theme, toggleTheme: () => setTheme((t) => (t === "dark" ? "light" : "dark")),
       muted, toggleMuted: () => setM((m) => !m), portrait, setPortrait, name, setName,
       mode, entries,
-      startDemo: () => { setMode("demo"); setEntries(DEMO_DATA); },
+      apiUrl, setApiUrl: (url) => { setApiUrl(url); localStorage.setItem("odna-api-url", url); setComparison(null); },
+      comparison, setComparison, processingConsent, setProcessingConsent,
+      startDemo: () => { setMode("demo"); setEntries([]); setComparison(null); setP(null); setProcessingConsent(false); },
       setReal: (e) => { setMode("real"); setEntries(e); },
     }}>{children}</Ctx.Provider>
   );

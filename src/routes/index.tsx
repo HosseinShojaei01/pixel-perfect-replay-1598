@@ -12,7 +12,9 @@ export const Route = createFileRoute("/")({
       { title: "OriginDNA — Discover the Story Behind Your DNA" },
       { name: "description", content: "Explore your ancestry through a cinematic, interactive dashboard. Try the demo or import real DNA test results." },
       { property: "og:title", content: "OriginDNA — Discover Your Story" },
-      { property: "og:description", content: "A premium, interactive way to explore your DNA ancestry results." },
+      { property: "og:description", content: "Photographic comparison and separately imported genetic ancestry results." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -34,14 +36,14 @@ function Index() {
   const { startDemo } = useApp();
   const nav = useNavigate();
   const features = [
-    { icon: Upload, title: "Personal portrait", body: "Your photo personalizes the report — it is never used to guess ancestry." },
+    { icon: Upload, title: "Personal portrait", body: "Compare photographic style with consent — never guess ancestry." },
     { icon: MapIcon, title: "Living world map", body: "Glowing markers and migration lines trace every region in your results." },
     { icon: Sparkles, title: "Cinematic 3D", body: "A real-time DNA helix and fluid motion make your story feel alive." },
-    { icon: FileDown, title: "Beautiful PDF", body: "Download a polished report, clearly labeled as demo or your real data." },
+    { icon: FileDown, title: "Beautiful PDF", body: "Download a polished report from your imported genetic test results." },
   ];
   const steps = [
-    ["01", "Upload a portrait", "Optional, stays in your browser."],
-    ["02", "Choose your data", "Explore the demo, or import results from your DNA test provider."],
+    ["01", "Upload a portrait", "Processed temporarily only with your consent."],
+    ["02", "Choose your data", "Compare photography or import your DNA test results."],
     ["03", "Explore & export", "Interactive map, charts, story and a downloadable report."],
   ];
   return (
@@ -59,11 +61,11 @@ function Index() {
           <p className="mt-6 max-w-lg text-lg text-muted-foreground">{t("Explore your ancestry through a beautiful interactive experience.")}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/upload" className={btnPrimary} onClick={() => blip(740)}>{t("Explore My Origins")} <ArrowRight className="h-4 w-4 rtl:rotate-180" /></Link>
-            <button className={btnGhost} onClick={() => { startDemo(); blip(520); nav({ to: "/dashboard" }); }}>{t("View Demo")}</button>
+            <button className={btnGhost} onClick={() => { startDemo(); blip(520); nav({ to: "/dashboard" }); }}>View Dashboard</button>
           </div>
           <div className="mt-8 flex max-w-lg items-start gap-3 rounded-2xl border border-cyan/20 bg-cyan/5 p-4 text-sm text-muted-foreground">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-cyan" />
-            <p>Accurate ancestry results require a DNA test. A photo can't reveal your genetic origins — OriginDNA visualizes results you import, or fictional demo data.</p>
+            <p>Accurate ancestry results require a DNA test. A photo can't reveal your genetic origins — OriginDNA visualizes results you import, separately from photographic comparisons.</p>
           </div>
         </motion.div>
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2 }} className="relative h-[420px] sm:h-[560px]">
@@ -105,7 +107,7 @@ function Index() {
           </div>
           <Link to="/import" className={btnPrimary}>{t("Import Real Results")}</Link>
         </div>
-        <p className="mt-10 flex items-center justify-center gap-2 text-xs text-muted-foreground"><Lock className="h-3.5 w-3.5" /> Privacy-first: photos and results stay in your browser and are never stored.</p>
+        <p className="mt-10 flex items-center justify-center gap-2 text-xs text-muted-foreground"><Lock className="h-3.5 w-3.5" /> Privacy-first: portraits are processed temporarily with consent; genetic results stay in your browser.</p>
       </section>
     </Page>
   );
