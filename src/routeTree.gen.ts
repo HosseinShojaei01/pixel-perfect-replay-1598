@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ImportRouteImport } from './routes/import'
+import { Route as ReferencesRouteImport } from './routes/references'
 import { Route as UploadRouteImport } from './routes/upload'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +36,11 @@ const ImportRoute = ImportRouteImport.update({
   path: '/import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReferencesRoute = ReferencesRouteImport.update({
+  id: '/references',
+  path: '/references',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/analysis': typeof AnalysisRoute
   '/dashboard': typeof DashboardRoute
   '/import': typeof ImportRoute
+  '/references': typeof ReferencesRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/analysis': typeof AnalysisRoute
   '/dashboard': typeof DashboardRoute
   '/import': typeof ImportRoute
+  '/references': typeof ReferencesRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,23 @@ export interface FileRoutesById {
   '/analysis': typeof AnalysisRoute
   '/dashboard': typeof DashboardRoute
   '/import': typeof ImportRoute
+  '/references': typeof ReferencesRoute
   '/upload': typeof UploadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analysis' | '/dashboard' | '/import' | '/upload'
+  fullPaths:
+    '/' | '/analysis' | '/dashboard' | '/import' | '/references' | '/upload'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analysis' | '/dashboard' | '/import' | '/upload'
-  id: '__root__' | '/' | '/analysis' | '/dashboard' | '/import' | '/upload'
+  to: '/' | '/analysis' | '/dashboard' | '/import' | '/references' | '/upload'
+  id:
+    | '__root__'
+    | '/'
+    | '/analysis'
+    | '/dashboard'
+    | '/import'
+    | '/references'
+    | '/upload'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +93,7 @@ export interface RootRouteChildren {
   AnalysisRoute: typeof AnalysisRoute
   DashboardRoute: typeof DashboardRoute
   ImportRoute: typeof ImportRoute
+  ReferencesRoute: typeof ReferencesRoute
   UploadRoute: typeof UploadRoute
 }
 
@@ -109,6 +127,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/references': {
+      id: '/references'
+      path: '/references'
+      fullPath: '/references'
+      preLoaderRoute: typeof ReferencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/upload': {
       id: '/upload'
       path: '/upload'
@@ -124,6 +149,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalysisRoute: AnalysisRoute,
   DashboardRoute: DashboardRoute,
   ImportRoute: ImportRoute,
+  ReferencesRoute: ReferencesRoute,
   UploadRoute: UploadRoute,
 }
 export const routeTree = rootRouteImport
