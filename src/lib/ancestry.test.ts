@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { DEMO_DATA, normalize, parseFile, total, validate, newEntry } from "./ancestry";
+import { normalize, parseFile, total, validate, newEntry } from "./ancestry";
 
 describe("ancestry rules", () => {
-  it("demo data adds up to exactly 100%", () => {
-    expect(total(DEMO_DATA)).toBe(100);
+  it("empty genetic results do not acquire ancestry percentages", () => {
+    expect(total([])).toBe(0);
+    expect(validate([])).toContain("Add at least one region.");
   });
   it("flags totals that are not 100%", () => {
     expect(validate([newEntry("Iran", 50), newEntry("Italy", 30)]).join()).toContain("80%");

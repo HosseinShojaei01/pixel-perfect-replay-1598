@@ -1,15 +1,6 @@
 export type Entry = { id: string; region: string; percent: number };
 export type Mode = "demo" | "real";
 
-export const DEMO_DATA: Entry[] = [
-  { id: "ir", region: "Iran", percent: 38 },
-  { id: "tr", region: "Turkey", percent: 22 },
-  { id: "it", region: "Italy", percent: 16 },
-  { id: "gr", region: "Greece", percent: 12 },
-  { id: "ge", region: "Georgia", percent: 8 },
-  { id: "other", region: "Other Regions", percent: 4 },
-];
-
 type Info = { lat: number; lng: number; flag: string; fa: string };
 export const REGIONS: Record<string, Info> = {
   iran: { lat: 32.4, lng: 53.7, flag: "🇮🇷", fa: "ایران" },
