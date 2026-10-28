@@ -69,5 +69,5 @@ export function dataUrlToBlob(url: string): Blob {
   if (!m) throw new Error("The photo could not be read. Please upload it again.");
   const raw = m[2] ? atob(m[3] ?? "") : decodeURIComponent(m[3] ?? "");
   const bytes = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-  return new Blob([bytes], { type: m[1] });
+  return new Blob([bytes], { type: m[1] ?? "image/jpeg" });
 }
