@@ -64,3 +64,10 @@ export async function comparePortrait(base: string, portrait: string, consent: b
   if (!result) throw new Error("Comparison ended without a completed result. No substitute results were generated.");
   return result;
 }
+export function dataUrlToBlob(url: string): Blob {
+  const m = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(url);
+  if (!m) throw new Error("The photo could not be read. Please upload it again.");
+  const raw = m[2] ? atob(m[3] ?? "") : decodeURIComponent(m[3] ?? "");
+  const bytes = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+  return new Blob([bytes], { type: m[1] });
+}
