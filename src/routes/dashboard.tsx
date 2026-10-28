@@ -11,6 +11,7 @@ import { colorFor, regionInfo } from "@/lib/ancestry";
 import { downloadReport } from "@/lib/report";
 import { blip } from "@/lib/sound";
 import { VisualResults } from "@/components/VisualResults";
+import { AiVisualAnalysis } from "@/components/AiVisualAnalysis";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -82,6 +83,7 @@ function Dashboard() {
       </motion.section>
 
       <VisualResults />
+      {portrait ? <AiVisualAnalysis portrait={portrait} /> : <p className="mt-8 text-sm text-muted-foreground">Add a photo on the <Link className="text-cyan underline" to="/upload">upload page</Link> to use the AI photographic comparison.</p>}
       <h2 className="mt-10 text-xl font-semibold">Genetic Ancestry</h2>
       {!entries.length && <p className="mt-3 text-sm text-muted-foreground">No genetic test results imported. <Link className="text-cyan underline" to="/import">Import DNA results</Link> to populate ancestry percentages and the geographic map.</p>}
       <div className="mt-5 grid gap-5 lg:grid-cols-3">
