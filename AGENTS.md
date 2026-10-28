@@ -16,3 +16,4 @@
 
 - The separately deployed `backend/` FastAPI service owns persisted references and pretrained embeddings; browser comparisons stream real API stages and never fall back to ancestry or fabricated scores.
 - Genetic dashboard entries originate only from imported user data; reference labels are restricted to non-sensitive photographic attributes.
+- AI photographic descriptions run through a createServerFn in `src/lib/visual-ai.functions.ts` (Lovable AI Gateway); photos are sent only after per-request consent and never stored, and the prompt forbids identity/ancestry inferences.

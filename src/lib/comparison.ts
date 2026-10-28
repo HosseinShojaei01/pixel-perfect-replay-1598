@@ -36,7 +36,7 @@ export async function apiRequest(base: string, path: string, init?: RequestInit)
 
 export async function comparePortrait(base: string, portrait: string, consent: boolean, onProgress: (progress: number, stage: string) => void, signal: AbortSignal): Promise<Comparison> {
   if (!consent) throw new Error("Explicit processing consent is required.");
-  const blob = await (await fetch(portrait, { signal })).blob();
+  const blob = dataUrlToBlob(portrait);
   const form = new FormData();
   form.append("image", blob, "portrait.jpg"); form.append("consent", "true");
   onProgress(5, "Sending your image");
@@ -63,4 +63,11 @@ export async function comparePortrait(base: string, portrait: string, consent: b
   } finally { await reader.cancel().catch(() => {}); }
   if (!result) throw new Error("Comparison ended without a completed result. No substitute results were generated.");
   return result;
+}
+export function dataUrlToBlob(url: string): Blob {
+  const m = /^data:([^;,]+)(;base64)?,(.*)$/s.exec(url);
+  if (!m) throw new Error("The photo could not be read. Please upload it again.");
+  const raw = m[2] ? atob(m[3] ?? "") : decodeURIComponent(m[3] ?? "");
+  const bytes = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+  return new Blob([bytes], { type: m[1] ?? "image/jpeg" });
 }

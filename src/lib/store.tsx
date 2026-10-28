@@ -26,7 +26,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [portrait, setP] = useState<string | null>(null);
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [processingConsent, setProcessingConsent] = useState(false);
-  const [apiUrl, setApiUrl] = useState(import.meta.env.VITE_PYTHON_API_URL ?? "");
+  const [apiUrl, setApiUrl] = useState<string>(import.meta.env["VITE_PYTHON_API_URL"] ?? "");
   const setPortrait = (photo: string | null) => { setP(photo); setComparison(null); setProcessingConsent(false); };
   const [name, setName] = useState("");
   const [mode, setMode] = useState<Mode>("demo");
